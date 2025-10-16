@@ -15,7 +15,7 @@ sudo rm -rf /var/www/html/*
 sudo cp -r /home/ubuntu/static-website-nginx-aws/* /var/www/html/
 
 #set permission so nginx can read 
-sudo chown -R www-data:www:data /var/www/html
+sudo chown -R www-data:www-data /var/www/html
 sudo chmod -R 755 /var/www/html
 
 # Restart Nginx
