@@ -11,9 +11,12 @@ sudo systemctl enable nginx
 # Remove default Nginx files
 sudo rm -rf /var/www/html/*
 
-# Clone website files from GitHub 
-cd /var/www/html
-sudo git clone https://github.com/soumya625/static-website-nginx-aws.git .
+# Clone website files to nginx root
+sudo cp -r /home/ubuntu/static-website-nginx-aws/* /var/www/html/
+
+#set permission so nginx can read 
+sudo chown -R www-data:www:data /var/www/html
+sudo chmod -R 755 /var/www/html
 
 # Restart Nginx
 sudo systemctl restart nginx
