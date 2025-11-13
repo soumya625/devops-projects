@@ -2,31 +2,23 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repo') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/soumya625/devops-projects.git'
+                git branch: 'main', url: 'https://github.com/soumya625/devops-projects.git'
             }
         }
 
-        stage('Build Image') {
+        stage('Build Docker Image') {
             steps {
-                sh 'sudo docker build -t nodejs-jenkins-docker-app .'
+                sh 'docker build -t nodejs-jenkins-docker .'
             }
         }
 
-        stage('Deploy Container') {
+        stage('Run Container') {
             steps {
-                sh '''
-                sudo docker rm -f nodejs-jenkins-docker-app || true
-                sudo docker run -d -p 80:3000 --name nodejs-jenkins-docker-app nodejs-jenkins-docker-app
-                '''
+                sh 'docker rm -f nodejs-jenkins-docker || true'
+                sh 'docker run -d -p 80:3000 --name nodejs-jenkins-docker nodejs-jenkins-docker'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Deployment Successful! Visit EC2 Public IP.'
         }
     }
 }
