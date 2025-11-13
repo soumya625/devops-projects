@@ -1,24 +1,40 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_BUILDKIT = '1'
+        IMAGE_NAME = "nodejs-jenkins-docker-app"
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/soumya625/devops-projects.git'
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t nodejs-jenkins-docker .'
+                script {
+                    dir('nodejs-jenkins-docker') {
+                        sh 'docker build -t $IMAGE_NAME .'
+                    }
+                }
             }
         }
 
         stage('Run Container') {
             steps {
-                sh 'docker rm -f nodejs-jenkins-docker || true'
-                sh 'docker run -d -p 80:3000 --name nodejs-jenkins-docker nodejs-jenkins-docker'
+                script {
+                    sh 'docker run -d -p 3000:3000 $IMAGE_NAME || true'
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed successfully."
         }
     }
 }
