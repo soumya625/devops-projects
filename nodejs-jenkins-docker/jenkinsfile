@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_BUILDKIT = '1'
-        IMAGE_NAME = "nodejs-jenkins-docker-app"
+        IMAGE_NAME = "nodejs-jenkins-docker"
     }
 
     stages {
@@ -26,7 +25,11 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    sh 'docker run -d -p 3000:3000 $IMAGE_NAME || true'
+                    sh '''
+                    docker stop $IMAGE_NAME || true
+                    docker rm $IMAGE_NAME || true
+                    docker run -d --name $IMAGE_NAME -p 3000:3000 $IMAGE_NAME
+                    '''
                 }
             }
         }
@@ -34,7 +37,7 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline completed successfully."
+            echo "✅ Pipeline completed successfully!"
         }
     }
 }
