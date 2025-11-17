@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "flask-jenkins-sonarqube"
+        IMAGE_NAME = "flask-jenkins-sonarqube"
+        SONARQUBE = "SonarQube"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/soumya625/flask-jenkins-sonarqube.git'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE}") {
+                    sh 'sonar-scanner -Dsonar.projectKey=flask-sonarqube -Dsonar.sources=.'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'sudo docker build -t ${IMAGE_NAME} .'
+            }
+        }
+
+        stage('Deploy Container') {
+            steps {
+                sh '''
+                sudo docker rm -f ${APP_NAME} || true
+                sudo docker run -d -p 80:5000 --name ${APP_NAME} ${IMAGE_NAME}
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Flask app deployed successfully with SonarQube analysis!"
+        }
+    }
+}
